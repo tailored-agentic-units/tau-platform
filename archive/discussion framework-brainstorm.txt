@@ -1,0 +1,82 @@
+Big Questions
+
+ROEs
+- Avoid Vendor lock
+- Open-source AMAP
+- Avoid package/library/api dependencies (but also dont recreate the wheel)
+- Be excellent to each other
+
+
+Architecture
+
+	- Do we build this for primarily web-services? (REST/Grpc)
+	- Or do we build this with IOT in mind? (GRPC, pub/sub, mqtt)
+		- if yes then do we need to consider RUST
+	- Who are the primary users?
+	- Where does CTO want to move with regards to IAM, Authorization, Authentication (this is going to be the foundation on which we build this architecture)
+		notes: I suggest that the default is the agentic pathways use the active users credentials, the agents themselves should have not creds but assume the identity of the user
+	- What networks does this need to ride on (currently i dont think there is much azure on yellow so we would be dealing with azure on red and AWS on yellow)
+
+
+Ontology/Nomenclature
+
+Notes: we need to build out structure and definitions for each of these. At a high level where/how do we separate concerns
+
+- Agent
+- Tool
+- Skill
+- Function
+- Service
+- Hub
+- Unit
+- etc.
+
+
+Development Patterns (Very dependent on IoT vs Web-services)
+	- What are the interfaces?
+		- GUI (web app)
+			- typescript
+			- lit.dev
+		- API (rest/grpc)
+			- Golang
+			- fiber (web framework + websockets)
+		- Message broker
+		- Etc.
+	- Where do the agents run?
+		- Possible configuration
+┌─────────────────────────────────────────┐
+│   Always-On Orchestrator                │
+│   (Container Apps, small instance)      │
+│   - Monitors queues                     │
+│   - Spawns agents                       │
+│   - Coordinates work                    │
+│   Cost: ~$20/month                      │
+└──────────────┬──────────────────────────┘
+               │
+               │ Spawns on-demand
+               ▼
+┌─────────────────────────────────────────┐
+│   Short Tasks (ACI)                     │
+│   - IoT device configuration            │
+│   - Quick data processing               │
+│   - API calls                           │
+│   Cost: $0 when idle, pennies per run   │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│   Medium Tasks (Container Apps)         │
+│   - Data analysis                       │
+│   - Multi-step workflows                │
+│   - Scale 0-100                         │
+│   Cost: $0 when idle                    │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│   Long Tasks (Batch)                    │
+│   - ML training                         │
+│   - Large data processing               │
+│   - Multi-hour jobs                     │
+│   Cost: $0 when idle                    │
+└─────────────────────────────────────────┘
+
+

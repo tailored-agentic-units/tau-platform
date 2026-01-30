@@ -1,0 +1,31 @@
+web-service-template/
+├── cmd/
+│   └── server/
+│       └── main.go                          # Application entry point
+│
+├── internal/
+│   ├── routes/                              # URL mapping to controllers --- Maps HTTP endpoints to controller handlers
+│   │                                        
+│   │
+│   ├── controllers/                         # HTTP request/response handling --- Parses requests, calls services, formats responses
+│   │                                        
+│   │
+│   ├── services/                            # Business logic + domain-specific helpers --- Orchestrates repos/clients, enforces business rules --- Contains private helper methods specific to each service
+│   │                                      
+│   │
+│   ├── repositories/                        # Database operations (CRUD) --- SQL queries, data persistence, ORM interactions
+│   │                                        
+│   │
+│   ├── clients/                             # External API integrations --- Third-party service calls (email, search, analytics, blob, etc.)
+│   │                                        
+│   │
+│   ├── utils/                               # Shared utilities (generic, reusable) --- Validation, formatting, helpers used across services
+│   │                                        
+│   │
+│   ├── models/                              # Data structures and entities --- Struct definitions, JSON tags, domain objects
+│   │                                        
+│   │
+│   └── config/                              # Configuration management --- Env vars, settings, app configuration
+│           
+│
+└── pkg/                                     # Public libraries (reusable across projects) --- Can be imported by external applications (How does this work in your mind from the TAU perspetive?)
