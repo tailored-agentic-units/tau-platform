@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Kanban Workflow Board</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 1.5rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: #f0f6fc;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #8b949e;
+            font-size: 0.95rem;
+        }
+
+        .workflow-info {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #8b949e;
+        }
+
+        .workflow-info h3 {
+            color: #f0f6fc;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .workflow-info p {
+            margin-bottom: 0.75rem;
+        }
+
+        .workflow-info strong {
+            color: #c9d1d9;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+
+        .column {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            min-height: 700px;
+            min-width: 320px;
+        }
+
+        .column-header {
+            padding: 1rem;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #161b22;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .column-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #f0f6fc;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .column-count {
+            background: #30363d;
+            color: #8b949e;
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .tasks-container {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .tasks-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .tasks-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .tasks-container::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 4px;
+        }
+
+        .tasks-container::-webkit-scrollbar-thumb:hover {
+            background: #444c56;
+        }
+
+        .task {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 0.75rem;
+            cursor: grab;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .task:hover {
+            border-color: #58a6ff;
+            background: #0d1117;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+        }
+
+        .task:active {
+            cursor: grabbing;
+        }
+
+        .task.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-id {
+            font-size: 0.8rem;
+            color: #58a6ff;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+
+        .task-priority {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+
+        .priority-high {
+            background: #da3633;
+            color: #f0f6fc;
+        }
+
+        .priority-medium {
+            background: #d29922;
+            color: #f0f6fc;
+        }
+
+        .priority-low {
+            background: #3fb950;
+            color: #f0f6fc;
+        }
+
+        .task-title {
+            font-weight: 500;
+            color: #c9d1d9;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
+        }
+
+        .tag {
+            background: #161b22;
+            color: #79c0ff;
+            border: 1px solid #388bfd;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+
+        .tag.bug {
+            color: #f85149;
+            border-color: #f85149;
+        }
+
+        .tag.feature {
+            color: #7ee787;
+            border-color: #7ee787;
+        }
+
+        .tag.docs {
+            color: #79c0ff;
+            border-color: #79c0ff;
+        }
+
+        .drop-indicator {
+            min-height: 2px;
+            background: transparent;
+            border-radius: 1px;
+            margin: 0.25rem 0;
+            transition: all 0.2s ease;
+        }
+
+        .drop-indicator.active {
+            background: #58a6ff;
+            min-height: 4px;
+            margin: 0.5rem 0;
+        }
+
+        .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #444c56;
+            font-size: 0.85rem;
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .add-task-btn {
+            margin: 1rem;
+            padding: 0.6rem 1rem;
+            background: #238636;
+            color: #f0f6fc;
+            border: 1px solid #26a641;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .add-task-btn:hover {
+            background: #2ea043;
+            border-color: #3fb950;
+        }
+
+        .workflow-diagram {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .flow-chart {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+            min-width: min-content;
+        }
+
+        .flow-step {
+            background: #0d1117;
+            border: 2px solid #30363d;
+            border-radius: 6px;
+            padding: 1rem;
+            text-align: center;
+            min-width: 140px;
+            flex-shrink: 0;
+            font-size: 0.85rem;
+            color: #8b949e;
+            font-weight: 500;
+        }
+
+        .flow-step.current {
+            border-color: #58a6ff;
+            color: #58a6ff;
+            background: rgba(88, 166, 255, 0.05);
+        }
+
+        .flow-arrow {
+            color: #30363d;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .board {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 GitHub Kanban Board</h1>
+            <p>Project workflow: Backlog → Done</p>
+        </div>
+
+        <div class="workflow-info">
+            <h3>Workflow Stages</h3>
+            <p><strong>Backlog/Todo:</strong> New tasks waiting to be started. Not yet assigned to a sprint.</p>
+            <p><strong>In Progress:</strong> Actively being worked on by a team member.</p>
+            <p><strong>In Review:</strong> Waiting for code review or QA approval.</p>
+            <p><strong>Rejected:</strong> Returned by reviewer for changes or fixes.</p>
+            <p><strong>Accepted:</strong> Approved and ready for deployment.</p>
+            <p><strong>Deployed Staging:</strong> Deployed to staging environment for final testing.</p>
+            <p><strong>Deployed Production/Done:</strong> Successfully released to production.</p>
+        </div>
+
+        <div class="workflow-diagram">
+            <div class="flow-chart">
+                <div class="flow-step">📝 Backlog</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">⚙️ In Progress</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">👀 In Review</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">❌ Rejected</div>
+                <div class="flow-arrow">⤴</div>
+                <div class="flow-step">✅ Accepted</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">🚀 Staging</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step current">🎉 Done/Released</div>
+            </div>
+        </div>
+
+        <div class="board">
+            <!-- Backlog Column -->
+            <div class="column">
+                <div class="column-header">
+                    <span class="column-title">📝 Backlog/Todo</span>
+                    <span class="column-count">3</span>
+                </div>
+                <div class="tasks-container" data-column="backlog">
+                    <div class="task" draggable="true">
+                        <div class="task-header">
+                            <span class="task-id">#1</span>
+                            <span class="task-priority priority-high">High</span>
+                        </div>
+                        <div class="task-title">Implement user authentication</div>
+                        <div class="task-meta">
+                            <span class="tag feature">feature</span>
+                            <span class="tag">3d</span>
+                        </div>
+                    </div>
+                    <div class="task" draggable="true">
+                        <div class="task-header">
+                            <span class="task-id">#2</span>
+                            <span class="task-priority priority-medium">Medium</span>
+                        </div>
+                        <div class="task-title">Add search functionality</div>
+                        <div class="task-meta">
+                            <span class="tag feature">feature</span>
+                            <span class="tag">2d</span>
+                        </div>
+                    </div>
+                    <div class="task" draggable="true">
+                        <div class="task-header">
+                            <span class="task-id">#8</span>
+                            <span class="task-priority priority-low">Low</span>
+                        </div>
+                        <div class="task-title">Update README documentation</div>
+                        <div class="task-meta">
+                            <span class="tag docs">docs</span>
+                            <span class="tag">1d</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="add-task-btn">+ Add issue</button>
+            </div>
+
+            <!-- In Progress Column -->
+            <div class="column">
+                <div class="column-header">
+                    <span class="column-title">⚙️ In Progress</span>
+                    <span class="column-count">2</span>
+                </div>
+                <div class="tasks-container" data-column="in-progress">
+                    <div class="task" draggable="true">
+                        <div class="task-header">
+                            <span class="task-id">#5</span>
+                            <span class="task-priority priority-high">High</span>
+                        </div>
+                        <div class="task-title">Fix login form validation</div>
+                        <div class="task-meta">
+                            <span class="tag bug">bug</span>
+                            <span class="tag">@dev1</span>
+                        </div>
+                    </div>
+                    <div class="task" draggable="true">
+                        <div class="task-header">
+                            <span class="task-id">#6</span>
+                            <span class="task-priority priority-medium">Medium</span>
+                        </div>
+                        <div class="task-title">Create API endpoints</div>
+                        <div class="task-meta">
+                            <span class="tag feature">feature</span>
+                            <span class="tag">@dev2</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="empty-state" style="display: none;">No tasks in progress</div>
+                <button class="add-task-btn">+ Add issue</button>
+            </div>
+
+            <!-- In Review Column -->
+            <div class="column">
+                <div class="column-header">
+                    <span class="column-title">👀 In Review</span>
+                    <span class="column-count">1</span>
+                </div>
+                <div class="tasks-container" data-column="in-review">
+                    <div class="task" draggable="true">
+                        <div class="task-header">
+                            <span class="task-id">#4</span>
+                            <span class="task-priority priority-medium">Medium</span>
+                        </div>
+                        <div class="task-title">Add password reset feature</div>
+                        <div class="task-meta">
+                            <span class="tag feature">feature</span>
+                            <span class="tag">pending-review</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="add-task-btn">+ Add issue</button>
+            </div>
+
+            <!-- Rejected Column -->
+            <div class="column">
+                <div class="column-header">
+                    <span class="column-title">❌ Rejected</span>
+                    <span class="column-count">1</span>
+                </div>
+                <div class="tasks-container" data-column="rejected">
+                    <div class="task" draggable="true">
+                        <div class="task-header">
+                            <span class="task-id">#3</span>
+                            <span class="task-priority priority-high">High</span>
+                        </div>
+                        <div class="task-title">Database schema update</div>
+                        <div class="task-meta">
+                            <span class="tag">needs-revision</span>
+                            <span class="tag">performance</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="add-task-btn">+ Add issue</button>
+            </div>
+
+            <!-- Accepted Column -->
+            <div class="column">
+                <div class="column-header">
+                    <span class="column-title">✅ Accepted</span>
+                    <span class="column-count">0</span>
+                </div>
+                <div class="tasks-container" data-column="accepted">
+                </div>
+                <div class="empty-state">No accepted tasks</div>
+                <button class="add-task-btn">+ Add issue</button>
+            </div>
+
+            <!-- Staging Column -->
+            <div class="column">
+                <div class="column-header">
+                    <span class="column-title">🚀 Staging</span>
+                    <span class="column-count">0</span>
+                </div>
+                <div class="tasks-container" data-column="staging">
+                </div>
+                <div class="empty-state">No tasks in staging</div>
+                <button class="add-task-btn">+ Add issue</button>
+            </div>
+
+            <!-- Done/Released Column -->
+            <div class="column">
+                <div class="column-header">
+                    <span class="column-title">🎉 Done/Released</span>
+                    <span class="column-count">5</span>
+                </div>
+                <div class="tasks-container" data-column="done">
+                    <div class="task" draggable="true">
+                        <div class="task-header">
+                            <span class="task-id">#1</span>
+                            <span class="task-priority priority-high">High</span>
+                        </div>
+                        <div class="task-title">Setup project repository</div>
+                        <div class="task-meta">
+                            <span class="tag feature">feature</span>
+                            <span class="tag">v1.0.0</span>
+                        </div>
+                    </div>
+                    <div class="task" draggable="true">
+                        <div class="task-header">
+                            <span class="task-id">#2</span>
+                            <span class="task-priority priority-medium">Medium</span>
+                        </div>
+                        <div class="task-title">Deploy to production</div>
+                        <div class="task-meta">
+                            <span class="tag">deployment</span>
+                            <span class="tag">v1.0.0</span>
+                        </div>
+                    </div>
+                    <div class="task" draggable="true">
+                        <div class="task-header">
+                            <span class="task-id">#3</span>
+                            <span class="task-priority priority-low">Low</span>
+                        </div>
+                        <div class="task-title">Setup CI/CD pipeline</div>
+                        <div class="task-meta">
+                            <span class="tag feature">feature</span>
+                            <span class="tag">v1.0.0</span>
+                        </div>
+                    </div>
+                    <div class="task" draggable="true">
+                        <div class="task-header">
+                            <span class="task-id">#7</span>
+                            <span class="task-priority priority-medium">Medium</span>
+                        </div>
+                        <div class="task-title">Add unit tests</div>
+                        <div class="task-meta">
+                            <span class="tag feature">feature</span>
+                            <span class="tag">v1.0.0</span>
+                        </div>
+                    </div>
+                    <div class="task" draggable="true">
+                        <div class="task-header">
+                            <span class="task-id">#9</span>
+                            <span class="task-priority priority-low">Low</span>
+                        </div>
+                        <div class="task-title">Performance optimization</div>
+                        <div class="task-meta">
+                            <span class="tag feature">feature</span>
+                            <span class="tag">v1.0.1</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="add-task-btn">+ Add issue</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let draggedElement = null;
+        let sourceColumn = null;
+
+        // Get all task containers
+        const taskContainers = document.querySelectorAll('.tasks-container');
+
+        // Add drag event listeners to all tasks
+        document.addEventListener('dragstart', (e) => {
+            if (e.target.classList.contains('task')) {
+                draggedElement = e.target;
+                sourceColumn = e.target.closest('.tasks-container');
+                e.target.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            }
+        });
+
+        document.addEventListener('dragend', (e) => {
+            if (e.target.classList.contains('task')) {
+                e.target.classList.remove('dragging');
+                draggedElement = null;
+                sourceColumn = null;
+                
+                // Remove all drop indicators
+                document.querySelectorAll('.drop-indicator.active').forEach(el => {
+                    el.classList.remove('active');
+                });
+            }
+        });
+
+        // Handle drag over
+        taskContainers.forEach(container => {
+            container.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                
+                if (!draggedElement) return;
+
+                const afterElement = getDragAfterElement(container, e.clientY);
+                
+                if (afterElement == null) {
+                    container.appendChild(draggedElement);
+                } else {
+                    container.insertBefore(draggedElement, afterElement);
+                }
+
+                updateCounts();
+            });
+        });
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.task:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        // Update column counts
+        function updateCounts() {
+            document.querySelectorAll('.column').forEach(column => {
+                const count = column.querySelectorAll('.task').length;
+                const countEl = column.querySelector('.column-count');
+                countEl.textContent = count;
+
+                // Show/hide empty state
+                const emptyState = column.querySelector('.empty-state');
+                if (emptyState) {
+                    emptyState.style.display = count === 0 ? 'flex' : 'none';
+                }
+            });
+        }
+
+        // Add task button functionality
+        document.querySelectorAll('.add-task-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const taskId = Math.floor(Math.random() * 1000) + 10;
+                const priorities = ['High', 'Medium', 'Low'];
+                const priority = priorities[Math.floor(Math.random() * 3)];
+                const priorityClass = 'priority-' + priority.toLowerCase();
+                
+                const newTask = document.createElement('div');
+                newTask.className = 'task';
+                newTask.draggable = true;
+                newTask.innerHTML = `
+                    <div class="task-header">
+                        <span class="task-id">#${taskId}</span>
+                        <span class="task-priority ${priorityClass}">${priority}</span>
+                    </div>
+                    <div class="task-title">New task</div>
+                    <div class="task-meta">
+                        <span class="tag">new</span>
+                        <span class="tag">1d</span>
+                    </div>
+                `;
+                
+                const container = e.target.closest('.column').querySelector('.tasks-container');
+                container.appendChild(newTask);
+                updateCounts();
+                
+                // Make new task draggable
+                newTask.addEventListener('dragstart', (e) => {
+                    draggedElement = newTask;
+                    sourceColumn = container;
+                    newTask.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+            });
+        });
+
+        // Initial count update
+        updateCounts();
+    </script>
+</body>
+</html>
