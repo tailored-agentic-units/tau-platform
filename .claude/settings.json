@@ -1,3 +1,32 @@
 {
-  "plansDirectory": "./.claude/plans"
+  "plansDirectory": "./.claude/plans",
+  "extraKnownMarketplaces": {
+    "tau-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "tailored-agentic-units/tau-marketplace"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "tau@atu-marketplace": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(gh auth status*)",
+      "Bash(gh issue list*)",
+      "Bash(gh issue view*)",
+      "Bash(gh project field-list*)",
+      "Bash(gh project item-list*)",
+      "Bash(gh project list*)",
+      "Bash(gh project view*)",
+      "Skill(tau:dev-workflow)",
+      "Skill(tau:github-cli)",
+      "Skill(tau:go-patterns)",
+      "Skill(tau:project-management)",
+      "Skill(tau:skill-creator)",
+      "Skill(tau:tau-core)",
+      "Skill(tau:tau-orchestrate)"
+    ]
+  }
 }
