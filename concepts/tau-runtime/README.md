@@ -568,40 +568,61 @@ Tier 3:          [tau-runtime]
 
 ## 7. Model Compatibility
 
-The agent runtime must work across the platforms available at all classification levels. Tool-calling reliability is the critical capability — the agentic loop depends on the model's ability to correctly generate structured tool call requests and interpret tool results.
+The agent runtime must work across the platforms available at all classification levels. Both **tool calling** and **reasoning** are critical model capabilities — tool calling drives the agentic loop, while reasoning enables effective tool selection, result interpretation, error recovery, and multi-step planning. Models that support both capabilities simultaneously are the strongest candidates for agent runtime deployment.
 
 ### 7.1 Ollama (Self-Hosted)
 
-Models available for local deployment with tool-calling support:
+Models supporting both tool calling and reasoning are the strongest candidates for local deployment:
 
-| Model | Parameters | Tool Calling | Notes |
-|-------|-----------|-------------|-------|
-| **Qwen 3** | 0.6B - 235B | Strong | Hybrid think/fast modes. Strong multilingual support. Recommended starting point for local development |
-| **Llama 3.2 / 3.3** | 1B - 70B | Strong | Reliable function calling. 3.2-3B is a good minimum for local development |
-| **Mistral 7B** | 7B | Good | Reliable function calling with low resource requirements |
-| **DeepSeek V3** | Various | Good | Strong reasoning, improved function calling in recent versions |
-| **Granite 3.2** (IBM) | Various | Good | Enterprise-focused, structured output support |
-| **Phi-4-Mini** (Microsoft) | 3.8B | Good | Compact with reasoning comparable to larger models |
+| Model | Parameters | Tool Calling | Reasoning | Notes |
+|-------|-----------|-------------|-----------|-------|
+| **Qwen 3** | 0.6B - 235B | Strong | Strong | Hybrid think/no_think modes. Dense and MoE variants. Recommended starting point for local development |
+| **GPT-OSS** (OpenAI) | 20B, 120B | Strong | Strong | OpenAI's open-weight models. Adjustable reasoning effort levels (low/medium/high). 20B runs on 16GB devices |
+| **Kimi K2 Thinking** (Moonshot AI) | MoE (~32B active) | Excellent | Excellent | Best-in-class agentic capability; supports 200-300 sequential tool calls. Cloud variant available |
+| **DeepSeek-V3.1** | 671B MoE | Strong | Strong | Hybrid thinking/non-thinking modes. Requires significant hardware |
+| **Devstral Small 2** (Mistral) | 24B | Strong | Limited | 68% on SWE-Bench Verified. Strong for software engineering agents |
+| **Nemotron-3-Nano** (NVIDIA) | 30B | Strong | Strong | Designed as an efficient agentic model |
+| **GLM-4.7-Flash** | 30B | Strong | Strong | Lightweight deployment, good balance of performance and efficiency |
 
-**Recommendation**: Qwen 3 (7B or larger) for development and testing. Best balance of tool-calling reliability, reasoning capability, and resource requirements.
+Models with strong tool calling but limited reasoning:
+
+| Model | Parameters | Tool Calling | Reasoning | Notes |
+|-------|-----------|-------------|-----------|-------|
+| **Qwen3-Coder** | 30B, 480B | Excellent | Limited | Purpose-built for agentic coding workflows |
+| **Ministral-3** (Mistral) | 3B, 8B, 14B | Strong | Limited | Edge deployment. Multi-modal, multi-lingual. Runs in browser via WebGPU |
+| **Granite4** (IBM) | 350M, 1B, 3B | Good | Limited | Ultra-small enterprise models suitable for edge/IoT |
+
+Models with strong reasoning but limited tool calling:
+
+| Model | Parameters | Tool Calling | Reasoning | Notes |
+|-------|-----------|-------------|-----------|-------|
+| **DeepSeek-R1** | 1.5B - 671B | Poor | Excellent | Performance approaching o3 and Gemini 2.5 Pro. Tool calling is unreliable |
+| **Magistral** (Mistral) | 24B | Limited | Strong | Dedicated reasoning model with transparent reasoning traces |
+| **Phi-4-Reasoning** (Microsoft) | 14B | Limited | Strong | Rivals much larger models on complex reasoning |
+
+**Recommendation**: Qwen 3 (8B or larger) or GPT-OSS 20B for development and testing. Both support tool calling and reasoning on consumer hardware with good balance of reliability and resource requirements.
 
 ### 7.2 Azure AI Foundry (Cloud-Hosted)
 
-Frontier models available through Azure AI Foundry:
+Frontier models available through Azure AI Foundry (Microsoft Foundry):
 
-| Model Family | Tool Calling | Notes |
-|-------------|-------------|-------|
-| **GPT-4o / GPT-4o-mini** | Excellent | Native OpenAI tool calling. Most reliable for production |
-| **Claude 3.5 / Opus 4.5** | Excellent | Available via Azure marketplace. Native tool use |
-| **Mistral Large** | Good | Available via Models as a Service |
-| **Llama 3.x** | Good | Available via Models as a Service |
+| Model Family | Tool Calling | Reasoning | Notes |
+|-------------|-------------|-----------|-------|
+| **GPT-5.2** | Excellent | Excellent | Freeform tool calling (no rigid schemas required). 272K context. State-of-the-art reasoning |
+| **Claude Opus 4.5 / Sonnet 4.5** | Excellent | Excellent | Full tool suite including computer use, code execution, web search. Model router available |
+| **Grok 4** (xAI) | Excellent | Excellent | First-principles reasoning with native tool use. New provider on Azure |
+| **DeepSeek-V3.2** | Excellent | Excellent | Thinking Retention Mechanism preserves reasoning across tool calls |
+| **o3 / o4-mini** | Good | Excellent | Native function calling within chain-of-thought. No parallel tool calls |
+| **Mistral Large 3** | Excellent | Very Good | 673B MoE with 128 experts. Best open-weight option for multi-tool orchestration |
+| **Phi-4-reasoning** (Microsoft) | Moderate | Very Good | Best small model option for constrained infrastructure |
 
 ### 7.3 Model Capability Detection
 
-Model capability detection is a tau-runtime concern, not a tau-core concern. The runtime should determine model capabilities through configuration rather than runtime probing. The existing `ModelConfig.Capabilities` map (per-protocol options) can be extended to include tool-calling metadata:
+Model capability detection is a tau-runtime concern, not a tau-core concern. The runtime should determine model capabilities through configuration rather than runtime probing. The existing `ModelConfig.Capabilities` map (per-protocol options) can be extended to include capability metadata:
 
 - Whether the model supports tool calling at all
 - Whether the model supports parallel tool calls
+- Whether the model supports reasoning / chain-of-thought (and whether it can be used simultaneously with tool calling)
 - Maximum context window size (for tau-session compaction decisions)
 - Whether the model supports vision (for multimodal tool results)
 
