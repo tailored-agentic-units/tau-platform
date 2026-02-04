@@ -58,7 +58,7 @@ The following insights are drawn from Anthropic's engineering publications and C
 
 ### 2.2 Context Engineering
 
-**Source**: Anthropic engineering guidance on context management
+**Source**: [Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
 
 | Insight | Implication | Library |
 |---------|------------|---------|
