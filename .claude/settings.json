@@ -9,7 +9,7 @@
     }
   },
   "enabledPlugins": {
-    "tau@atu-marketplace": true
+    "tau@tau-marketplace": true
   },
   "permissions": {
     "allow": [
