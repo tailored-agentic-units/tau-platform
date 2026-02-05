@@ -1,0 +1,8 @@
+{
+  "classification": "SECRET//NOFORN//WNINTEL",
+  "alternative_readings": [],
+  "marking_summary": [
+    "SECRET NOFORN WNINTEL"
+  ],
+  "rationale": "Clear SECRET markings with NOFORN and WNINTEL caveats in both header and footer. No ambiguity detected."
+}

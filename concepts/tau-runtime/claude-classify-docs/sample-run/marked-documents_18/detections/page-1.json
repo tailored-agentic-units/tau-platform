@@ -1,0 +1,19 @@
+{
+  "page_number": 1,
+  "markings_found": [
+    {
+      "text": "SECRET NOFORN",
+      "location": "header",
+      "legibility": 1.0,
+      "faded": false
+    },
+    {
+      "text": "SECRET NOFORN",
+      "location": "footer",
+      "legibility": 1.0,
+      "faded": false
+    }
+  ],
+  "clarity_score": 0.9,
+  "filter_suggestion": null
+}

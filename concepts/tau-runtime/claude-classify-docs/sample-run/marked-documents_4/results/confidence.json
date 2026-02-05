@@ -1,0 +1,42 @@
+{
+  "overall_score": 0.865,
+  "factors": [
+    {
+      "name": "marking_clarity",
+      "score": 0.90,
+      "weight": 0.30,
+      "description": "High clarity score from detection analysis"
+    },
+    {
+      "name": "marking_consistency",
+      "score": 1.0,
+      "weight": 0.25,
+      "description": "Perfect agreement across all page markings"
+    },
+    {
+      "name": "spatial_coverage",
+      "score": 1.0,
+      "weight": 0.15,
+      "description": "Markings present in header and footer"
+    },
+    {
+      "name": "enhancement_impact",
+      "score": 0.0,
+      "weight": 0.10,
+      "description": "No enhancement needed or applied"
+    },
+    {
+      "name": "alternative_count",
+      "score": 1.0,
+      "weight": 0.10,
+      "description": "Zero alternatives indicate clear reading"
+    },
+    {
+      "name": "detection_legibility",
+      "score": 0.95,
+      "weight": 0.10,
+      "description": "High legibility score from detection"
+    }
+  ],
+  "recommendation": "REVIEW"
+}

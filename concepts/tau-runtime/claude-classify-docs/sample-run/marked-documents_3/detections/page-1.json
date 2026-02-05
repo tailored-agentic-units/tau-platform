@@ -1,0 +1,25 @@
+{
+  "page_number": 1,
+  "markings_found": [
+    {
+      "text": "SECRET//NOFORN//20280901",
+      "location": "header",
+      "legibility": 1.0,
+      "faded": false
+    },
+    {
+      "text": "JANUARY 2004",
+      "location": "footer",
+      "legibility": 1.0,
+      "faded": false
+    },
+    {
+      "text": "SECRET//NOFORN//20280901",
+      "location": "footer",
+      "legibility": 1.0,
+      "faded": false
+    }
+  ],
+  "clarity_score": 1.0,
+  "filter_suggestion": null
+}

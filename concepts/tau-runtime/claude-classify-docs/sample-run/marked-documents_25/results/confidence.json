@@ -1,0 +1,42 @@
+{
+  "overall_score": 0.93,
+  "factors": [
+    {
+      "name": "marking_clarity",
+      "score": 0.95,
+      "weight": 0.30,
+      "description": "Excellent clarity across all markings"
+    },
+    {
+      "name": "marking_consistency",
+      "score": 1.0,
+      "weight": 0.25,
+      "description": "All markings agree on SECRET classification"
+    },
+    {
+      "name": "spatial_coverage",
+      "score": 1.0,
+      "weight": 0.15,
+      "description": "Markings in all expected locations"
+    },
+    {
+      "name": "enhancement_impact",
+      "score": 0.5,
+      "weight": 0.10,
+      "description": "No enhancement needed"
+    },
+    {
+      "name": "alternative_count",
+      "score": 1.0,
+      "weight": 0.10,
+      "description": "Zero alternatives, unambiguous"
+    },
+    {
+      "name": "detection_legibility",
+      "score": 0.95,
+      "weight": 0.10,
+      "description": "High legibility across all markings"
+    }
+  ],
+  "recommendation": "ACCEPT"
+}

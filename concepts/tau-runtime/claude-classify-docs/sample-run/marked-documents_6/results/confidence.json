@@ -1,0 +1,42 @@
+{
+  "overall_score": 0.94,
+  "factors": [
+    {
+      "name": "marking_clarity",
+      "score": 0.85,
+      "weight": 0.30,
+      "description": "Good clarity across detection"
+    },
+    {
+      "name": "marking_consistency",
+      "score": 1.0,
+      "weight": 0.25,
+      "description": "Identical markings in header and footer"
+    },
+    {
+      "name": "spatial_coverage",
+      "score": 1.0,
+      "weight": 0.15,
+      "description": "Complete coverage in expected locations"
+    },
+    {
+      "name": "enhancement_impact",
+      "score": 1.0,
+      "weight": 0.10,
+      "description": "No enhancement needed"
+    },
+    {
+      "name": "alternative_count",
+      "score": 1.0,
+      "weight": 0.10,
+      "description": "No alternative readings"
+    },
+    {
+      "name": "detection_legibility",
+      "score": 0.875,
+      "weight": 0.10,
+      "description": "High average legibility"
+    }
+  ],
+  "recommendation": "ACCEPT"
+}

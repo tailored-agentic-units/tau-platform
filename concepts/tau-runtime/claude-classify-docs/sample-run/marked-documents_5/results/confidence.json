@@ -1,0 +1,42 @@
+{
+  "overall_score": 0.41,
+  "factors": [
+    {
+      "name": "marking_clarity",
+      "score": 0.7,
+      "weight": 0.30,
+      "description": "Page clarity adequate but no markings present"
+    },
+    {
+      "name": "marking_consistency",
+      "score": 0.0,
+      "weight": 0.25,
+      "description": "No markings found to evaluate consistency"
+    },
+    {
+      "name": "spatial_coverage",
+      "score": 0.0,
+      "weight": 0.15,
+      "description": "No markings in expected header/footer locations"
+    },
+    {
+      "name": "enhancement_impact",
+      "score": 0.5,
+      "weight": 0.10,
+      "description": "Enhancement not applied, neutral score"
+    },
+    {
+      "name": "alternative_count",
+      "score": 1.0,
+      "weight": 0.10,
+      "description": "No alternative classifications, unambiguous result"
+    },
+    {
+      "name": "detection_legibility",
+      "score": 0.5,
+      "weight": 0.10,
+      "description": "Not applicable, no markings detected"
+    }
+  ],
+  "recommendation": "REJECT"
+}

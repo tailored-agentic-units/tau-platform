@@ -1,0 +1,42 @@
+{
+  "overall_score": 0.825,
+  "factors": [
+    {
+      "name": "marking_clarity",
+      "score": 0.75,
+      "weight": 0.30,
+      "description": "Good image clarity, no classification markings detected"
+    },
+    {
+      "name": "marking_consistency",
+      "score": 1.0,
+      "weight": 0.25,
+      "description": "Consistent absence of classification markings across page"
+    },
+    {
+      "name": "spatial_coverage",
+      "score": 1.0,
+      "weight": 0.15,
+      "description": "Standard header location examined successfully"
+    },
+    {
+      "name": "enhancement_impact",
+      "score": 0.0,
+      "weight": 0.10,
+      "description": "No enhancement applied, no improvement opportunity"
+    },
+    {
+      "name": "alternative_count",
+      "score": 1.0,
+      "weight": 0.10,
+      "description": "No alternative readings, clear result"
+    },
+    {
+      "name": "detection_legibility",
+      "score": 1.0,
+      "weight": 0.10,
+      "description": "High legibility of all detected text"
+    }
+  ],
+  "recommendation": "REVIEW"
+}

@@ -1,0 +1,19 @@
+{
+  "page_number": 1,
+  "markings_found": [
+    {
+      "text": "SECRET//X1",
+      "location": "header",
+      "legibility": 0.95,
+      "faded": false
+    },
+    {
+      "text": "SECRET//X1",
+      "location": "footer",
+      "legibility": 0.95,
+      "faded": false
+    }
+  ],
+  "clarity_score": 0.9,
+  "filter_suggestion": null
+}

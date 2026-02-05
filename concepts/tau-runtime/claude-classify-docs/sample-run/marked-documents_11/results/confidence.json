@@ -1,0 +1,42 @@
+{
+  "overall_score": 0.94,
+  "factors": [
+    {
+      "name": "marking_clarity",
+      "score": 0.95,
+      "weight": 0.30,
+      "description": "Excellent clarity score across all pages"
+    },
+    {
+      "name": "marking_consistency",
+      "score": 1.0,
+      "weight": 0.25,
+      "description": "Identical markings in header and footer"
+    },
+    {
+      "name": "spatial_coverage",
+      "score": 1.0,
+      "weight": 0.15,
+      "description": "Markings in both expected locations"
+    },
+    {
+      "name": "enhancement_impact",
+      "score": 0.85,
+      "weight": 0.10,
+      "description": "No enhancement needed, high initial quality"
+    },
+    {
+      "name": "alternative_count",
+      "score": 1.0,
+      "weight": 0.10,
+      "description": "No alternative readings, unambiguous classification"
+    },
+    {
+      "name": "detection_legibility",
+      "score": 1.0,
+      "weight": 0.10,
+      "description": "Perfect legibility on all markings"
+    }
+  ],
+  "recommendation": "ACCEPT"
+}

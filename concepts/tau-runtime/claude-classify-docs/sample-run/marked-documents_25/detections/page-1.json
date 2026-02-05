@@ -1,0 +1,37 @@
+{
+  "page_number": 1,
+  "markings_found": [
+    {
+      "text": "SECRET",
+      "location": "header",
+      "legibility": 0.95,
+      "faded": false
+    },
+    {
+      "text": "CLASSIFICATION: SECRET",
+      "location": "body",
+      "legibility": 0.95,
+      "faded": false
+    },
+    {
+      "text": "CAVEATS: NOFORN",
+      "location": "body",
+      "legibility": 0.95,
+      "faded": false
+    },
+    {
+      "text": "CLASSIFICATION: SECRET",
+      "location": "footer",
+      "legibility": 0.95,
+      "faded": false
+    },
+    {
+      "text": "CAVEATS: NOFORN",
+      "location": "footer",
+      "legibility": 0.95,
+      "faded": false
+    }
+  ],
+  "clarity_score": 0.95,
+  "filter_suggestion": null
+}

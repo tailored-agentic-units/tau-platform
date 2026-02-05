@@ -1,0 +1,31 @@
+{
+  "page_number": 1,
+  "markings_found": [
+    {
+      "text": "CLASSIFICATION: SECRET",
+      "location": "body",
+      "legibility": 1.0,
+      "faded": false
+    },
+    {
+      "text": "CAVEATS: NOFORN",
+      "location": "body",
+      "legibility": 1.0,
+      "faded": false
+    },
+    {
+      "text": "CLASSIFICATION: SECRET",
+      "location": "body",
+      "legibility": 1.0,
+      "faded": false
+    },
+    {
+      "text": "CAVEATS: NOFORN",
+      "location": "body",
+      "legibility": 1.0,
+      "faded": false
+    }
+  ],
+  "clarity_score": 1.0,
+  "filter_suggestion": null
+}

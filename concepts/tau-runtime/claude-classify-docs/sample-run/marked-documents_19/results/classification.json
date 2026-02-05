@@ -1,0 +1,9 @@
+{
+  "classification": "SECRET//NOFORN",
+  "alternative_readings": [],
+  "marking_summary": [
+    "SECRET",
+    "NOFORN"
+  ],
+  "rationale": "Document contains SECRET markings in header and footer with NOFORN caveat. Highest marking level determines classification."
+}

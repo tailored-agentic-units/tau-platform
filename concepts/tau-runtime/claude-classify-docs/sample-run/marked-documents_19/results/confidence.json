@@ -1,0 +1,42 @@
+{
+  "overall_score": 0.86,
+  "factors": [
+    {
+      "name": "marking_clarity",
+      "score": 0.78,
+      "weight": 0.30,
+      "description": "Good clarity from detection analysis"
+    },
+    {
+      "name": "marking_consistency",
+      "score": 1.0,
+      "weight": 0.25,
+      "description": "Consistent SECRET markings across page"
+    },
+    {
+      "name": "spatial_coverage",
+      "score": 1.0,
+      "weight": 0.15,
+      "description": "Markings in expected header and footer"
+    },
+    {
+      "name": "enhancement_impact",
+      "score": 0.5,
+      "weight": 0.10,
+      "description": "No enhancement applied"
+    },
+    {
+      "name": "alternative_count",
+      "score": 1.0,
+      "weight": 0.10,
+      "description": "No alternative readings present"
+    },
+    {
+      "name": "detection_legibility",
+      "score": 0.78,
+      "weight": 0.10,
+      "description": "Good legibility despite footer fading"
+    }
+  ],
+  "recommendation": "REVIEW"
+}

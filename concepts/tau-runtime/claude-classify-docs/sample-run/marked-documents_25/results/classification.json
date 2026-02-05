@@ -1,0 +1,10 @@
+{
+  "classification": "SECRET//NOFORN",
+  "alternative_readings": [],
+  "marking_summary": [
+    "SECRET",
+    "CLASSIFICATION: SECRET",
+    "CAVEATS: NOFORN"
+  ],
+  "rationale": "Document contains consistent SECRET markings across all locations with NOFORN caveat explicitly stated."
+}

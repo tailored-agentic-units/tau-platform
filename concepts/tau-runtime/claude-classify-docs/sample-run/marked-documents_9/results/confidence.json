@@ -1,0 +1,42 @@
+{
+  "overall_score": 0.73,
+  "factors": [
+    {
+      "name": "marking_clarity",
+      "score": 0.7,
+      "weight": 0.30,
+      "description": "Moderate clarity; no markings detected"
+    },
+    {
+      "name": "marking_consistency",
+      "score": 1.0,
+      "weight": 0.25,
+      "description": "Consistent absence of markings across pages"
+    },
+    {
+      "name": "spatial_coverage",
+      "score": 0.5,
+      "weight": 0.15,
+      "description": "No markings in expected locations"
+    },
+    {
+      "name": "enhancement_impact",
+      "score": 0.5,
+      "weight": 0.10,
+      "description": "No enhancement applied; unable to verify"
+    },
+    {
+      "name": "alternative_count",
+      "score": 1.0,
+      "weight": 0.10,
+      "description": "No alternative readings required"
+    },
+    {
+      "name": "detection_legibility",
+      "score": 0.7,
+      "weight": 0.10,
+      "description": "Moderate legibility; no markings present"
+    }
+  ],
+  "recommendation": "REVIEW"
+}
