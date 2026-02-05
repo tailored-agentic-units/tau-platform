@@ -45,9 +45,10 @@ mkdir -p "${WORK_DIR}/${DOC_NAME}/pages" "${WORK_DIR}/${DOC_NAME}/detections" \
 
 ## Step 3: Process Each Document
 
-For each PDF, execute steps 3a through 3e. When processing a directory,
-documents are processed sequentially (each document may spawn parallel
-subagents internally).
+**CRITICAL: Process documents ONE AT A TIME.** Complete the ENTIRE pipeline
+(render → detect → enhance → classify → score → report) for one document
+before starting the next. Do NOT spawn subagents for multiple documents
+simultaneously. This prevents context window exhaustion.
 
 ### Step 3a: Render Pages
 
@@ -68,22 +69,25 @@ done
 
 Verify all page images exist by listing `${WORK_DIR}/pages/`.
 
-### Step 3b: Detect Markings (Parallel)
+### Step 3b: Detect Markings (Parallel, Batched)
 
-Spawn one `page-detector` subagent per page using the Task tool. All
-subagents MUST be spawned in a single message for parallel execution.
+Spawn `page-detector` subagents using the Task tool. To avoid context window
+exhaustion, process pages in batches of **at most 8 pages** at a time.
 
-For each page N (1 to PAGE_COUNT), spawn a Task with:
-- **subagent_type**: `page-detector`
-- **prompt**: Include:
-  - Image path: `${WORK_DIR}/pages/page-${N}.png`
-  - Page number: `${N}`
-  - Output path: `${WORK_DIR}/detections/page-${N}.json`
+For each batch of pages:
+1. Spawn one Task per page in a single message (parallel within the batch):
+   - **subagent_type**: `page-detector`
+   - **prompt**: Include:
+     - Image path: `${WORK_DIR}/pages/page-${N}.png`
+     - Page number: `${N}`
+     - Output path: `${WORK_DIR}/detections/page-${N}.json`
+2. Wait for ALL subagents in the batch to complete.
+3. Do NOT read task output content. The subagents write results to files.
+   Simply confirm the detection JSON files exist.
+4. Proceed to the next batch until all pages are processed.
 
-Wait for ALL page detectors to complete.
-
-Read all detection JSON files from `${WORK_DIR}/detections/` and collect
-the results.
+After all batches complete, read the detection JSON files from
+`${WORK_DIR}/detections/` to collect results.
 
 ### Step 3c: Evaluate Enhancement Need
 
