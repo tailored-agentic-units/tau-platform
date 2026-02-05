@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls *)",
+      "Bash(magick *)",
+      "Bash(mkdir *)",
+      "Skill(classify-docs)",
+      "Skill(classify-document)",
+      "Skill(detect-markings)",
+      "Skill(enhance-page)",
+      "Skill(render-pages)",
+      "Skill(score-confidence)"
+    ]
+  }
+}
