@@ -37,6 +37,44 @@ A modular ecosystem of independent Go libraries, each encapsulating a distinct c
 
 Following Anthropic's core principle: **simple, composable patterns over complex frameworks**. Start with the minimum viable abstraction at each layer. Only increase complexity when it demonstrably improves outcomes. Each library should be independently useful, testable, and comprehensible.
 
+### Runtime Boundary Principle
+
+The runtime is a closed-loop input/output processing system. Inside the runtime, the only concern is managing receipt of context, processing the workflow with additional inputs/outputs as needed, and returning the result.
+
+The runtime has **zero awareness of extensions** — it does not know or care what connects to it. The runtime *interface* provides the extensibility points for external infrastructure:
+
+- **Session bootstrapping** — context provided from external persistence sources
+- **Context exchange** — sending and receiving additional context in various formats
+- **Metadata output** — structured metadata emitted during processing
+- **Administration** — diagnostic, validation, and administrative features
+
+Any concerns beyond processing are outside the runtime's boundary: data persistence, integration with IAM, containerization standards, and platform-specific infrastructure. These are layers of complexity that reside outside the runtime, connecting through its interface.
+
+This is analogous to the relationship between the Linux kernel and its ecosystem. The kernel establishes standards and provides a syscall boundary. Extensions are userspace services that connect through that boundary. The kernel doesn't reach out to extensions — they connect to it. This enables the same kernel to serve as the foundation for an embedded device OS, a desktop OS, a server OS, or any other operating system. Similarly, the tau-runtime serves as the foundation for embedded agents, desktop agents, server agents, or any other deployment model.
+
+### Extension Ecosystem
+
+Each component external to the runtime is a sub-system, analogous to an operating system component:
+
+- **Persistence** — session state storage, memory file management
+- **IAM** — authentication, authorization
+- **Container/Sandbox** — execution environment management
+- **MCP Gateway** — proxies MCP servers for external tool access
+- **Observability** — metrics, tracing, logging export
+- **UI** — web interface, CLI, or other user-facing interfaces
+
+Extensions connect to the runtime through its interface — the runtime never reaches out to extensions. For local development, the runtime composes with locally-run extensions (e.g., via Docker Compose). For production, extensions transition to cloud or self-hosted services. The runtime binary remains the same in both cases.
+
+### Proof-of-Concept Validation
+
+The claude-classify-docs implementation (see `claude-classify-docs/`) validates the core design thesis. It reimplements a Go web service (~11,000 lines backed by PostgreSQL and blob storage) as a Claude Code project (~600 lines of markdown configuration). Key findings that inform the runtime architecture:
+
+- **Three primitives suffice**: Memory (bootstrap context), skills (capability specifications), and subagents (parallel task delegation) compose into a functional agent runtime. The TAU libraries formalize exactly these: tau-memory, tau-skills, tau-runtime (subagent orchestration).
+- **Component mapping is direct**: Every agent-lab component (StateGraph, State nodes, ProcessParallel, system prompts, checkpoints) maps cleanly to a Claude Code feature (orchestrating skill, individual skills, concurrent Tasks, skill content, working directory files). This validates that the TAU library interfaces capture the essential abstractions.
+- **Interfaces are the product**: The classify-docs workflow runs identically on any runtime that implements the tau-tools, tau-skills, and tau-memory interfaces. The workflow specification (prompts, graph topology, scoring factors) remains constant — only the execution machinery changes.
+- **Filesystem as state**: Working directory files provide implicit checkpointing and state management without a database. This validates tau-memory's filesystem-first approach.
+- **Skill orchestration replaces code**: The runtime's value is enabling complex, multi-stage workflows through standardized, composable primitives rather than bespoke infrastructure.
+
 ---
 
 ## 2. Anthropic Reference Analysis
@@ -166,7 +204,25 @@ Key properties of this hierarchy:
 - **Independent foundations**: tau-memory has zero TAU dependencies; tau-tools and tau-session depend only on tau-core types
 - **Clean separation**: Each library owns a single domain with no overlap
 
-### 3.3 The tau-core Deconstruction
+### 3.3 Repository Strategy
+
+Each library is a separate repository under `github.com/tailored-agentic-units/` to preserve clean Go module paths:
+
+| Library | Repository | Module Path |
+|---------|-----------|------------|
+| tau-core | `tailored-agentic-units/tau-core` | `github.com/tailored-agentic-units/tau-core` |
+| tau-agent | `tailored-agentic-units/tau-agent` | `github.com/tailored-agentic-units/tau-agent` |
+| tau-orchestrate | `tailored-agentic-units/tau-orchestrate` | `github.com/tailored-agentic-units/tau-orchestrate` |
+| tau-memory | `tailored-agentic-units/tau-memory` | `github.com/tailored-agentic-units/tau-memory` |
+| tau-tools | `tailored-agentic-units/tau-tools` | `github.com/tailored-agentic-units/tau-tools` |
+| tau-session | `tailored-agentic-units/tau-session` | `github.com/tailored-agentic-units/tau-session` |
+| tau-skills | `tailored-agentic-units/tau-skills` | `github.com/tailored-agentic-units/tau-skills` |
+| tau-mcp | `tailored-agentic-units/tau-mcp` | `github.com/tailored-agentic-units/tau-mcp` |
+| tau-runtime | `tailored-agentic-units/tau-runtime` | `github.com/tailored-agentic-units/tau-runtime` |
+
+A `go.work` workspace file at `~/tau/` provides the monorepo-like local development experience — enabling cross-repo changes without `replace` directives in `go.mod` files. Each repository is independently versioned using standard Go semantic versioning (`v0.1.0`, `v0.2.0`, etc.) and has its own CI pipeline. Integration testing across repositories is supported via the workspace.
+
+### 3.4 The tau-core Deconstruction
 
 tau-core currently bundles foundational types with LLM client machinery. Libraries like tau-tools only need type definitions (e.g., `response.ToolCall`) but would pull in the entire HTTP client and provider system as a transitive dependency. This violates the principle of minimal coupling.
 
@@ -699,38 +755,75 @@ Skills are created as part of the library's implementation, not as a separate ef
 
 ## 9. Deployment Vision
 
-The agent runtime supports two deployment modes with a single, standard API surface. Whether the runtime executes locally or within a container, the interface to the agent is identical.
+The runtime is a closed-loop processing system. External services connect to it through its interface — the runtime has no awareness of what connects to it. Deployment modes differ only in how extensions are configured and where they run; the runtime binary remains the same.
 
 ### 9.1 Local Mode
 
-The agent executes directly on the host system, similar to Claude Code's CLI. It has access to the local filesystem, installed tools, and network. This is the primary mode for development and interactive use.
+The agent executes directly on the host system. Extensions run locally or in Docker containers alongside the runtime.
 
 - Tool execution: direct subprocess/filesystem calls
 - Memory files: host filesystem paths
 - Skills: discovered from host filesystem directories
 - MCP servers: launched as local subprocesses
+- Extensions: local services (e.g., Ollama for LLM, filesystem for persistence)
 
 ### 9.2 Container/Sandbox Mode
 
-The agent executes within a container (Docker, Podman, or similar) and can only operate within the container's filesystem and network boundaries. This is the mode for production deployment, untrusted environments, and sandboxed execution.
+The agent executes within a container. Extensions connect over the network through the runtime's interface.
 
 - Tool execution: confined to container filesystem and processes
 - Memory files: container-local paths (mounted or built-in)
 - Skills: baked into the container image or mounted at runtime
-- MCP servers: either inside the container or accessed via network transport (SSE)
+- MCP servers: accessed via network transport (SSE)
+- Extensions: cloud or self-hosted services connecting through the runtime interface
 
-### 9.3 Standard API
+### 9.3 ConnectRPC Interface
 
-The runtime exposes a standard API that is deployment-mode agnostic. Whether the runtime is local or containerized, consumers interact through the same interface:
+The runtime exposes its interface via **ConnectRPC** (`connectrpc.com/connect`), providing the extensibility boundary through which all external services connect. The runtime has no knowledge of what connects to it.
 
-- Submit prompts
-- Receive streaming responses (text and tool execution events)
-- Manage sessions (create, resume, list)
-- Configure tools and permissions
-- Load and manage skills
-- Create and approve plans
+**Why ConnectRPC**:
+- **Go-native**: Uses standard `net/http.Handler` and `http.ServeMux` — no custom transport infrastructure
+- **Multi-protocol**: A single service definition serves gRPC, gRPC-Web, and Connect protocol (HTTP/JSON with Protobuf) simultaneously. Browser clients, gRPC clients, and simple HTTP clients all work against the same server
+- **Streaming**: Server streaming for token-by-token response output, client streaming for context injection, bidirectional streaming for interactive sessions
+- **Interceptors**: Middleware at the interface boundary for auth, validation, logging, metrics — these are extension points, not runtime concerns
+- **Protobuf schemas**: Type-safe code generation via `buf generate`; schemas serve as the interface contract
+- **Protovalidate**: Request validation via protobuf annotations
 
-The environment abstraction is a tau-runtime concern. It provides an `Environment` interface that tools use for all filesystem and process operations, allowing the same tool implementations to work in both local and container modes.
+**Why ConnectRPC over alternatives**:
+- vs gRPC: ConnectRPC uses standard `net/http`, avoiding the separate HTTP/2 transport layer required by `grpc-go`
+- vs REST/HTTP: Protobuf schemas provide type safety, native streaming, and code generation that OpenAPI cannot match
+- vs Go interfaces alone: Go interfaces define the in-process API between libraries; ConnectRPC defines the network API for the runtime's external boundary
+
+### 9.4 Extension Architecture
+
+```
+External services connect THROUGH the interface.
+The runtime has zero awareness of extensions.
+
+    Extensions (external services)
+         ├── Persistence    (session state, memory files)
+         ├── IAM            (authentication, authorization)
+         ├── Container      (sandbox management)
+         ├── MCP Gateway    (proxies MCP servers)
+         ├── Observability  (metrics, tracing export)
+         └── UI             (web interface, CLI)
+              |
+              |--- ConnectRPC Interface (extensibility boundary)
+              |
+         tau-runtime (closed-loop processing)
+```
+
+Extensions are sub-systems analogous to operating system components. The runtime is the kernel; the ConnectRPC interface is the syscall boundary; extensions are userspace services. This decoupling enables the same runtime to serve as the foundation for embedded agents, desktop agents, server agents, or any other deployment model.
+
+### 9.5 Local Development Environment
+
+For local development, the runtime runs as a Go binary on the host and extensions run as local services:
+
+- **Runtime**: `go run ./cmd/tau-runtime` on the host
+- **LLM provider**: Ollama running locally or in Docker
+- **Persistence**: Filesystem-backed (no external service needed initially)
+- **Docker Compose**: Orchestrates extension services when needed
+- **Transition**: Same runtime binary deploys to containers with cloud-hosted extensions in production
 
 ---
 
@@ -745,6 +838,8 @@ The environment abstraction is a tau-runtime concern. It provides an `Environmen
 | **Token counting accuracy** | Incorrect compaction timing — either too aggressive (losing context) or too conservative (exceeding window) | TokenCounter interface allows model-specific implementations; conservative default estimates with configurable safety margin; compaction is a strategy pattern that can be swapped |
 | **Breaking changes during tau-core deconstruction** | Existing consumers of tau-core (tau-orchestrate, external users) break when packages move | Semantic versioning with major version bump; clear migration documentation; Tier 0 is specifically scoped as a breaking restructure before new development begins |
 | **Go module dependency management** | Diamond dependency problems if multiple tau libraries depend on different tau-core versions | All tau libraries should target the same tau-core version; Go modules handle this well as long as versions are coordinated; the iterative build process ensures each tier is stable before the next begins |
+| **Multi-repo coordination overhead** | Dependency version drift, release coordination friction across 9 repos | go.work workspace for local dev; shared CI patterns; coordinated releases via GitHub project phases |
+| **Knowledge fragmentation across repos** | Contributors lose context switching between repos; patterns diverge | tau-marketplace plugin provides shared skills and subagents usable across all project boundaries; tau-platform skill provides ecosystem-wide context; dev skills in each repo encode local patterns |
 
 ---
 
@@ -767,3 +862,4 @@ All insights in this document are derived from the following Anthropic publicati
 | Date | Revision | Trigger |
 |------|----------|---------|
 | 2026-02-04 | Initial concept document | Concept development session |
+| 2026-02-06 | Runtime boundary principle, extension ecosystem, ConnectRPC interface, separate repos with go.work, proof-of-concept validation | Phase 1 preparation session |
