@@ -185,17 +185,15 @@ The following insights are drawn from Anthropic's engineering publications and C
 
 ### 3.2 Dependency Hierarchy
 
-```
-                           kernel
-                       /   |    \     \
-                      /    |     \     \
-                    mcp  skills   \  orchestrate
-                     |     |       \           |
-                   tools  memory   session   agent
-                      \              |         /
-                       \             |        /
-                        +------- core -------+
-```
+- **kernel** — all subsystems below
+  - **orchestrate** — agent
+    - **agent** — core
+  - **mcp** — tools
+    - **tools** — core
+  - **skills** — memory
+    - **memory** — *(no internal dependencies)*
+  - **session** — core
+- **core** — *(external: uuid)*
 
 Key properties of this hierarchy:
 
