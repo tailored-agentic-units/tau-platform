@@ -14,7 +14,7 @@ Enables clean workflows for all downstream development.
 
 | Step | Initiative | Scope | Target |
 |------|-----------|-------|--------|
-| A1 | Marketplace refactor | Decompose monolithic `tau` plugin into 8 standalone plugins. Steps 1-3 of the refactor plan (structural move, update marketplace.json, remove monolithic plugin) can execute immediately. Steps 4-5 (new tau-agent/tau-orchestrate usage skills, kernel skill split) await library API stability. | tau-marketplace |
+| ~~A1~~ | ~~Marketplace refactor~~ | ~~Done (2026-04-08). Decomposed into 6 standalone plugins (dev-workflow, github-cli, go-patterns, project-management, tau-overview, kernel) at v0.1.0. Established per-plugin `{plugin}/v{version}` release convention. Removed dev-types, .lsp.json. Steps 4-5 (agent/orchestrate plugins, kernel split) remain deferred.~~ | ~~tau-marketplace~~ |
 | A2 | Formalize iterative-dev skill | Adapt ~/code/revolutions/.claude/skills/iterative-dev into a marketplace skill. Maintain dev-workflow role boundaries (developer owns source code; AI owns testing, comments, docs, contextual artifacts). Include implementation guide patterns. | tau-marketplace |
 | A3 | Library-dev skills | Create [library]-dev skills for each extracted library: agent, orchestrate, format, provider, protocol. Modeled after kernel-dev. Each lives within its host library repository. | tau/agent, tau/orchestrate, tau/format, tau/provider, tau/protocol |
 
